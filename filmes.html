@@ -15,15 +15,92 @@
 					//cond@2 verifica o status de resposta 200-> elemento encontrado e enviado
 					if(xmlHttp.readyState == 4 && xmlHttp.status == 200) {
 						let XMLFilmes = xmlHttp.responseText
-						console.log(XMLFilmes)
+						//console.log(XMLFilmes) //Imprime no console o arquivo xml puro
 						//classe nativa js
 						let parser = new DOMParser();
 						//@param1 String que sera feita o parse ( retorno de responseText) @param2 tipo do texto
 						domFilmes = parser.parseFromString(XMLFilmes,'text/xml'); //recupera arvore de elementos xml
 						//Tranforma a arvore de elementos em um objeto json
 						jsonFilmes = xmlToJson(domFilmes)
-						console.log(domFilmes)//imprime no console a arvore de elementos
-						console.log(jsonFilmes)//imprime no console o objeto json
+						//console.log(domFilmes)//imprime no console a arvore de elementos
+						//console.log(jsonFilmes)//imprime no console o objeto json
+
+						//percorre os nós do arquivo json
+						for(let i in jsonFilmes['filmes']['filme']){
+							//console.log(jsonFilmes['filmes']['filme'][i])//Imprime os arquivos que estão sendo percorridos nos nós do arquivo Json
+
+
+							//variavel que recura p laço, diminuio código na hora da chamada
+							let item = jsonFilmes['filmes']['filme'][i]
+							//jsonFilmesjsonFilmes['filmes']['filme'][i]-['titulo']['#text']
+
+							//criando variavel tipo div
+							let divRow = document.createElement('div')
+							divRow.className = 'row'
+
+							let divCol = document.createElement('div')
+							divCol.className = 'col'
+
+							let p1 = document.createElement('p')
+							p1.innerHTML = '<strong>Titulo: </strong>' +  item['titulo']['#text']
+							let p2 = document.createElement('p')
+							p2.innerHTML = '<strong>Resumo: </strong>' + item['resumo']['#text']
+
+							let genero = ''
+							for(let g in item.genero){
+								if(genero){
+									genero += ', ' //separa os elemntos do array por ,
+								}
+								genero += item.genero[g]['text']
+								//console.log(item.genero[g]['#text']) //Imprime array de generos
+							}
+							let p3 = document.createElement('p')
+							p3.innerHTML = '<strong>Gênero: </strong>' + genero
+
+							let elenco = ''
+							for(let e in item.elenco.ator) {
+								if(elenco) elenco += ', '//separa os elemntos do array por ,
+
+								elenco += item.elenco.ator[e]['#text']
+							}
+							let p4 = document.createElement('p')
+							p4.innerHTML = '<strong>Elenco: </strong>' + elenco
+							let p5 = document.createElement('p')
+							p5.innerHTML = '<strong>Data de lançamento:</strong> ' + item.dataLancamento['#text'] + ' (' + item.dataLancamento['@attributes']['pais'] + ')'// objeto associado a um tributo pais definido na tag xml
+
+							let hr = document.createElement('hr')
+							
+							//criando herarquia dos elementos html
+							divRow.appendChild(divCol)
+							divCol.appendChild(p1)
+							divCol.appendChild(p2)
+							divCol.appendChild(p3)
+							divCol.appendChild(p4)
+							divCol.appendChild(p5)	
+							divCol.appendChild(hr)
+
+							// seleciona elemento no DOM )container id lista)
+							// adiciona como nó filho o div row que por sua vez ja contém os elementos agregados
+							document.getElementById('lista').appendChild(divRow)
+
+
+						}
+
+
+					/*				
+						<div class="row">
+							<div class="col">
+								<!-- rotulo e informação dos filmes-->
+								<p><strong>Titulo: </strong>Titulo do filme	</p>
+								<p><strong>Resumo: </strong>Resumo do filme	</p>
+								<p><strong>Gênero: </strong>Gênero do filme	</p>
+								<p><strong>Elenco: </strong>Elenco do filme	</p>
+								<p><strong>Data de lançamento:</strong>Data de lançamento do filme	</p>
+								<hr>
+							</div>		
+						</div>
+					*/
+
 					}
 					//cond@1 verifica estado, 4-> requisição realizada com sucesso
 					//cond@2 verifica o status de resposta 200-> elemento nao encontrado
@@ -46,8 +123,8 @@
 			</div>
 		</nav>
 
-		<div class="container">
-			<div class="row">
+		<div class="container" id="lista">
+			<div class="row mb-5" >
 				<div class="col">
 					<button type="button" class="btn btn-success" onclick="getFilmes()">Listar filmes</button>
 				</div>
