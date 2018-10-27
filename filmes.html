@@ -1,0 +1,57 @@
+<html lang="pt-br">
+	<head>
+		<meta charset="utf-8">
+		<title>Catálogo de filmes</title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+		<script src="xmltojson.js"></script><!--biblioteca para fazer o parse de xml -->
+		<script>
+			function getFilmes() {
+				let xmlHttp = new XMLHttpRequest();
+				//@param1 verbo de requisição @param2 url a ser requisitado
+				xmlHttp.open('GET', 'http://localhost/filmesAjax/filmes.xml')
+
+				xmlHttp.onreadystatechange = () => {
+					//cond@1 verifica estado, 4-> requisição realizada com sucesso
+					//cond@2 verifica o status de resposta 200-> elemento encontrado e enviado
+					if(xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+						let XMLFilmes = xmlHttp.responseText
+						console.log(XMLFilmes)
+						//classe nativa js
+						let parser = new DOMParser();
+						//@param1 String que sera feita o parse ( retorno de responseText) @param2 tipo do texto
+						domFilmes = parser.parseFromString(XMLFilmes,'text/xml'); //recupera arvore de elementos xml
+						//Tranforma a arvore de elementos em um objeto json
+						jsonFilmes = xmlToJson(domFilmes)
+						console.log(domFilmes)//imprime no console a arvore de elementos
+						console.log(jsonFilmes)//imprime no console o objeto json
+					}
+					//cond@1 verifica estado, 4-> requisição realizada com sucesso
+					//cond@2 verifica o status de resposta 200-> elemento nao encontrado
+					if(xmlHttp.readyState == 4 && xmlHttp.status == 404) {
+						//..
+					}
+				}
+
+				xmlHttp.send()
+			}
+		</script>
+	</head>
+	<body>
+		
+		<nav class="navbar navbar-light bg-light mb-4">
+			<div class="container">
+				<div class="navbar-brand mb-0 h1">
+					<h3>Catálogo de filmes</h3>
+				</div>
+			</div>
+		</nav>
+
+		<div class="container">
+			<div class="row">
+				<div class="col">
+					<button type="button" class="btn btn-success" onclick="getFilmes()">Listar filmes</button>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
