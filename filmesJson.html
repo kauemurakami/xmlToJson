@@ -1,0 +1,119 @@
+<html lang="pt-br">
+<!--FAZ UMA REQUISIÇÃO XML-->
+	<head>
+		<meta charset="utf-8">
+		<title>Catálogo de filmes</title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+		<script src="xmltojson.js"></script><!--biblioteca para fazer o parse de xml -->
+		<script>
+			function getFilmes() {
+				let xmlHttp = new XMLHttpRequest();
+				//@param1 verbo de requisição @param2 url a ser requisitado
+				xmlHttp.open('GET', 'http://localhost/filmesAjax/xmlToJson/filmes.json')
+
+				xmlHttp.onreadystatechange = () => {
+					//cond@1 verifica estado, 4-> requisição realizada com sucesso
+					//cond@2 verifica o status de resposta 200-> elemento encontrado e enviado
+					if(xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+						let JSONFilmes = xmlHttp.responseText
+						//console.log(JSONFilmes) 
+						// parse sa String JSON para um objeto JSON
+						let objJSONFilmes = JSON.parse(JSONFilmes)
+						//console.log(objJSONFilmes)
+
+
+						//percorre os nós do arquivo json
+						for(let i in objJSONFilmes.filmes){
+							//console.log(jsonFilmes['filmes']['filme'][i])//Imprime os arquivos que estão sendo percorridos nos nós do arquivo Json
+
+							//variavel que recura p laço, diminuio código na hora da chamada
+							let item = objJSONFilmes.filmes[i]
+							//jsonFilmesjsonFilmes['filmes']['filme'][i]-['titulo']['#text']
+							//console.log(item)
+
+							//criando variavel tipo div
+							let divRow = document.createElement('div')
+							divRow.className = 'row'
+
+							let divCol = document.createElement('div')
+							divCol.className = 'col'
+
+							let p1 = document.createElement('p')
+							p1.innerHTML = '<strong>Titulo: </strong>' +  item.titulo
+							let p2 = document.createElement('p')
+							p2.innerHTML = '<strong>Resumo: </strong>' + item.resumo
+
+							let genero = ''
+							for(let g in item.generos){
+								if(genero){
+									genero += ', ' //separa os elemntos do array por ,
+								}
+								//procura no nó de generos se ha um ou mais genero
+								genero += item.generos[g].genero
+								//console.log(item.genero[g]['#text']) //Imprime array de generos
+							}
+							let p3 = document.createElement('p')
+							p3.innerHTML = '<strong>Gênero: </strong>' + genero
+
+							let elenco = ''
+							for(let e in item.elenco) {
+								if(elenco) elenco += ', '//separa os elemntos do array por ,
+
+								elenco += item.elenco[e].ator
+							}
+							let p4 = document.createElement('p')
+							p4.innerHTML = '<strong>Elenco: </strong>' + elenco
+							let p5 = document.createElement('p')
+							p5.innerHTML = '<strong>Data de lançamento:</strong> ' + item.dataLancamento.data + ' (' + item.dataLancamento.pais + ')'// objeto associado a um tributo pais definido na tag xml
+
+							let hr = document.createElement('hr')
+							
+							//criando herarquia dos elementos html
+							divRow.appendChild(divCol)
+							divCol.appendChild(p1)
+							divCol.appendChild(p2)
+							divCol.appendChild(p3)
+							divCol.appendChild(p4)
+							divCol.appendChild(p5)	
+							divCol.appendChild(hr)
+
+							// seleciona elemento no DOM )container id lista)
+							// adiciona como nó filho o div row que por sua vez ja contém os elementos agregados
+							document.getElementById('lista').appendChild(divRow)
+
+
+						} 
+
+
+
+					}
+					//cond@1 verifica estado, 4-> requisição realizada com sucesso
+					//cond@2 verifica o status de resposta 200-> elemento nao encontrado
+					if(xmlHttp.readyState == 4 && xmlHttp.status == 404) {
+						//..
+					}
+				}
+
+				xmlHttp.send()
+			}
+		</script>
+	</head>
+	<body>
+		
+		<nav class="navbar navbar-light bg-light mb-4">
+			<div class="container">
+				<div class="navbar-brand mb-0 h1">
+					<h3>Catálogo de filmes</h3>
+				</div>
+			</div>
+		</nav>
+
+		<div class="container" id="lista">
+			<div class="row mb-5" >
+				<div class="col">
+					<button type="button" class="btn btn-success" onclick="getFilmes()">Listar filmes</button>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
